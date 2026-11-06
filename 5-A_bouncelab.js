@@ -27,7 +27,14 @@ function update(dt) {
   if (y + r > canvas.height) {
     y = canvas.height - r;
     vy = -vy;
+
+    vx = vx * 0.5;
+    vy = vy * 0.5;
+
   }
+
+  
+
   if (y - r < 0) {
     y = r;
     vy = -vy;
