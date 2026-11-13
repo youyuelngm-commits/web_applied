@@ -5,7 +5,7 @@ const ctx = canvas.getContext("2d");
 const CONFIG = {
   GRAVITY: 2000,          // 9.8 m/秒² × 20
   JUMP_SPEED: 800,        // 3 m/秒 × 20
-  MOVE_SPEED: 240,       // 5 m/秒 × 20
+  MOVE_SPEED: 1000,       // 5 m/秒 × 20
   MAX_JUMPS: 3,          // 現実では空中で跳べない
   FALL_GRAVITY_RATE: 1,  // 現実では落ちるときも重力は同じ
 };
