@@ -11,21 +11,47 @@ enemies.push(createEnemy(200, 80));
 enemies.push(createEnemy(380, -120));
 enemies.push(createEnemy(540, 60));
 
+// 止まって動く敵
+const stopperEnemy = createEnemy(450, 90);
+stopperEnemy.type = "stopper";
+stopperEnemy.timer = 0;
+stopperEnemy.moving = true;
+enemies.push(stopperEnemy);
+
 // ③ 動かす：配列の敵を1体ずつ取り出して、同じ処理をする
 function updateEnemies(dt) {
   for (const enemy of enemies) {
-    enemy.x = enemy.x + enemy.vx * dt;
-    // 端を越えたら、位置を戻して、向きを反対に（５-４の跳ね返り）
-    if (enemy.x < 0) {
-      enemy.x = 0;
-      enemy.vx = -enemy.vx;
+    let canMove = true;               // ★ 追加：このフレームで動けるかどうかの状態
+
+    if (enemy.type === "stopper") {   // ★ 追加：止まって動く敵だけの処理
+      enemy.timer = enemy.timer + dt; // ★ 追加：時間をためる
+      if (enemy.timer >= 1) {         // ★ 追加：1秒たったら
+        enemy.timer = 0;              // ★ 追加：タイマーを0に戻す
+        if (enemy.moving === true) {  // ★ 追加：動く／止まるを切り替える
+          enemy.moving = false;
+        } else {
+          enemy.moving = true;
+        }
+      }
+      canMove = enemy.moving;         // ★ 追加：moving の状態を反映する
     }
-    if (enemy.x + enemy.w > canvas.width) {
-      enemy.x = canvas.width - enemy.w;
-      enemy.vx = -enemy.vx;
-    }
+
+    if (canMove) {                    // ★ 変更：動けるときだけ横移動と跳ね返りをする
+      enemy.x = enemy.x + enemy.vx * dt;
+      // 端を越えたら、位置を戻して、向きを反対に（５-４の跳ね返り）
+      if (enemy.x < 0) {
+        enemy.x = 0;
+        enemy.vx = -enemy.vx;
+      }
+      if (enemy.x + enemy.w > canvas.width) {
+        enemy.x = canvas.width - enemy.w;
+        enemy.vx = -enemy.vx;
+      }
+    }                                 // ★ 変更：if (canMove) の閉じカッコ
   }
 }
+
+
 
 // プレイヤーとぶつかったとき：上から落ちてきたときだけ、敵を倒す
 function collideWithEnemies(prevBottom) {
@@ -40,8 +66,12 @@ function collideWithEnemies(prevBottom) {
 
 // ④ 描く：配列の敵を1体ずつ取り出して描く
 function drawEnemies() {
-  ctx.fillStyle = "#ff6b6b";
-  for (const enemy of enemies) {
+  for (const enemy of enemies) {      // ★ 変更：敵ごとに色を変えるためループの中へ移動
+    if (enemy.type === "stopper" && enemy.moving === false) { // ★ 追加：止まっている間は色を変える
+      ctx.fillStyle = "#ffa94d";      // ★ 追加
+    } else {                          // ★ 追加
+      ctx.fillStyle = "#ff6b6b";      // ★ 変更：通常の赤色
+    }                                 // ★ 追加
     ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
   }
   ctx.fillStyle = "#e8eeff";
